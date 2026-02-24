@@ -49,13 +49,15 @@ async function handleResponse(response) {
   }
 
   if (!response.ok) {
+    console.error("❌ API ERROR RESPONSE:", data);
+
     const message =
       (typeof data === "object" && data?.message) ||
-      data ||
+      JSON.stringify(data) ||
       `Request failed with status ${response.status}`;
 
     const error = new Error(message);
-    error.status = response.status; 
+    error.status = response.status;
     throw error;
   }
 
@@ -104,9 +106,25 @@ export async function applyToJob({
   uuid,
   jobId,
   candidateId,
+  applicationId,
   repoUrl,
 }) {
   try {
+    console.log("=== APPLY BODY ===");
+    console.log({
+      uuid,
+      jobId,
+      candidateId,
+      applicationId,
+      repoUrl,
+    });
+
+    if (!uuid || !jobId || !candidateId || !applicationId || !repoUrl) {
+      throw new Error("Missing required fields in applyToJob.");
+    }
+
+    const cleanRepoUrl = repoUrl.trim();
+
     const response = await fetchWithTimeout(
       `${BASE_URL}/api/candidate/apply-to-job`,
       {
@@ -116,9 +134,10 @@ export async function applyToJob({
         },
         body: JSON.stringify({
           uuid,
-          jobId,
+          jobId: String(jobId),
           candidateId,
-          repoUrl,
+          applicationId,
+          repoUrl: cleanRepoUrl,
         }),
       }
     );

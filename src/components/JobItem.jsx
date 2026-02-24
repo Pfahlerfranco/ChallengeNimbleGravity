@@ -21,7 +21,8 @@ export default function JobItem({ job, candidate }) {
       await applyToJob({
         uuid: candidate.uuid,
         jobId: job.id,
-        candidateId: candidate.id,
+        candidateId: candidate.candidateId,
+        applicationId: candidate.applicationId,
         repoUrl,
       });
 
